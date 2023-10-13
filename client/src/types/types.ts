@@ -1,6 +1,6 @@
 import { SVGAttributes } from 'react';
 
-export type MessageHistory = { timestamp: number; text: string }[];
+export type MessageHistoryList = { timestamp: number; text: string }[];
 
 export type MessageEventPayload = {
   type: 'msg' | 'loonState';
@@ -37,3 +37,8 @@ export type TurretState = {
   level: number;
   id: string;
 }
+
+export type TurretPosition = {
+  top: number;
+  left: number;
+};

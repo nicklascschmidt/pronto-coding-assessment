@@ -19,11 +19,12 @@ import {
   LoonStateTopicMessageEventData,
   MessageEventData,
   MessageEventPayload,
-  MessageHistory,
+  MessageHistoryList,
   MsgTopicMessageEventData,
   TurretState
 } from './types/types';
 import './App.css';
+import MessageHistory from './components/MessageHistory';
 
 const WS_URL = 'ws://127.0.0.1:8000';
 
@@ -32,6 +33,12 @@ const AppContainer = styled.div`
   grid-template-columns: 1fr min-content;
   gap: 1rem;
   margin: 1rem;
+`;
+
+const CommandPanelContainer = styled.div`
+  display: grid;
+  grid-template-rows: min-content 1fr;
+  gap: 0.5rem;
 `;
 
 // Width ranges from 0-200 for the loon positions, so imagine the
@@ -61,31 +68,17 @@ const Loon = styled.div<{
     css`calc(${$positionX}px * ${PX_MULTIPLIER})`};
 `;
 
-const HorizontalLine = styled.div`
-  position: absolute;
-  bottom: 50%;
-  border-bottom: 1px solid purple;
-  width: 100%;
-`;
-
-const VerticalLine = styled.div`
-  position: absolute;
-  left: 0%;
-  border-right: 1px solid purple;
-  height: 100%;
-`;
-
 const App = () => {
   const loonCanvasRef = useRef<HTMLDivElement>(null);
   const [loonsPositions, setLoonsPositions] = useState<
     [string, LoonPosition][]
   >(
-    // []
-    sampleLoonsData as [string, LoonPosition][]
+    []
+    // sampleLoonsData as [string, LoonPosition][]
   );
   const [turrets, setTurrets] = useState<TurretState[]>([]);
   const [selectedTurret, setSelectedTurret] = useState<TurretState>();
-  const [messageHistory, setMessageHistory] = useState<MessageHistory>([]);
+  const [messageHistory, setMessageHistory] = useState<MessageHistoryList>([]);
   const [gameStatus, setGameStatus] = useState<GameStatus>('NOT_STARTED');
   const { sendJsonMessage, readyState } = useWebSocket(WS_URL, {
     onOpen: () => {
@@ -171,14 +164,16 @@ const App = () => {
 
   return (
     <AppContainer>
-      <CommandPanel
-        handleStartGame={handleStartGame}
-        handleEndGame={handleEndGame}
-        handleAddTurret={handleAddTurret}
-        messageHistory={messageHistory}
-        selectedTurret={selectedTurret}
-        handleLevelUpTurret={handleLevelUpTurret}
-      />
+      <CommandPanelContainer>
+        <CommandPanel
+          handleStartGame={handleStartGame}
+          handleEndGame={handleEndGame}
+          handleAddTurret={handleAddTurret}
+          selectedTurret={selectedTurret}
+          handleLevelUpTurret={handleLevelUpTurret}
+        />
+        <MessageHistory messageHistory={messageHistory} />
+      </CommandPanelContainer>
 
       <LoonCanvas ref={loonCanvasRef} className={LOON_CANVAS_CLASS_NAME}>
         {turrets.map((turret, idx) => (
@@ -193,8 +188,6 @@ const App = () => {
             isSelected={turret.id === selectedTurret?.id}
           />
         ))}
-        <HorizontalLine />
-        <VerticalLine />
         {loonsPositions.map(([_loonId, loonData], idx) => (
           <Loon
             key={idx}
