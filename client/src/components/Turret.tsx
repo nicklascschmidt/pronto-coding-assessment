@@ -1,12 +1,8 @@
 import {
-  useRef,
   useEffect,
-  useState,
   useCallback,
-  useMemo,
   FC,
   RefObject,
-  MouseEventHandler,
   SetStateAction,
   Dispatch
 } from 'react';
@@ -16,17 +12,18 @@ import {
   getClosestLoon,
   getTurretPositionInLoonUnits
 } from '../helpers/helpers.js';
-import useInterval from '../hooks/useInterval.js';
-import { GameStatus, LoonPosition, TurretState } from '../types/types.js';
+import useInterval from '../hooks/useInterval';
+import {
+  GameStatus,
+  LoonPosition,
+  TurretPosition,
+  TurretState
+} from '../types/types.js';
 import { SendJsonMessage } from 'react-use-websocket/dist/lib/types.js';
 import { LOON_CANVAS_CLASS_NAME } from '../constants/constants';
+import useDragAndDrop from '../hooks/useDragAndDrop';
 
 const TURRET_SIZE_PX = 32;
-
-type TurretPosition = {
-  top: number;
-  left: number;
-};
 
 const DragContainer = styled.div<{
   $position: TurretPosition;
@@ -66,82 +63,11 @@ const Turret: FC<TurretProps> = ({
   setSelectedTurret,
   isSelected
 }) => {
-  const dragRef = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [position, setPosition] = useState({
-    left: TURRET_SIZE_PX / 2,
-    top: TURRET_SIZE_PX / 2
-  });
   const iconColor = isSelected ? 'blue' : 'black';
-
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
-      if (containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect();
-        const offsetX = e.clientX - rect.left;
-        const offsetY = e.clientY - rect.top;
-
-        setPosition({
-          left: offsetX,
-          top: offsetY
-        });
-      }
-    },
-    [containerRef]
-  );
-
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-    document.removeEventListener('mousemove', handleMouseMove);
-    document.removeEventListener('mouseup', handleMouseUp);
-  }, [handleMouseMove]);
-
-  const handleMouseDown: MouseEventHandler<HTMLDivElement> = useCallback(
-    (e) => {
-      e.preventDefault();
-      setIsDragging(true);
-
-      if (dragRef.current) {
-        const rect = dragRef.current.getBoundingClientRect();
-        const offsetX = e.clientX - rect.left;
-        const offsetY = e.clientY - rect.top;
-
-        document.addEventListener('mousemove', handleMouseMove);
-        document.addEventListener('mouseup', handleMouseUp);
-
-        setPosition({
-          left: position.left + offsetX - TURRET_SIZE_PX / 2,
-          top: position.top + offsetY - TURRET_SIZE_PX / 2
-        });
-      }
-    },
-    [handleMouseMove, handleMouseUp, position]
-  );
-
-  // When the position changes, ensure the turret stays within the canvas.
-  useEffect(() => {
-    if (containerRef.current) {
-      const container = containerRef.current.getBoundingClientRect();
-      const turretOffset = TURRET_SIZE_PX / 2;
-      if (position && container) {
-        if (position.left - turretOffset < 0) {
-          setPosition({ ...position, left: turretOffset });
-        } else if (position.left + turretOffset > container.width) {
-          setPosition({
-            ...position,
-            left: container.width - turretOffset
-          });
-        } else if (position.top - turretOffset < 0) {
-          setPosition({ ...position, top: turretOffset });
-        } else if (position.top + turretOffset > container.height) {
-          setPosition({
-            ...position,
-            top: container.height - turretOffset
-          });
-        }
-      }
-    }
-  }, [position, containerRef]);
+  const { handleMouseDown, isDragging, position, dragRef } = useDragAndDrop({
+    containerRef,
+    elementSizePx: TURRET_SIZE_PX
+  });
 
   const handlePopLoon = useCallback(() => {
     const turretPosition = getTurretPositionInLoonUnits(position);
