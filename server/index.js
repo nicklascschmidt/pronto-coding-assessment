@@ -43,10 +43,14 @@ const eventTypes = {
   POP_LOON: "pop_loon",
 };
 
+// When we receive a message from the client, perform a resulting
+//  action - i.e. send a command thru the external websocket connection.
 const handleMessage = (data, isBinary) => {
   const message = isBinary ? data : data.toString();
   const dataFromClient = JSON.parse(message);
 
+  // When the game starts, subscribe to `loonState`,
+  //  else if a loon is popped, then send a pop_loon command
   if (dataFromClient.type === eventTypes.START_GAME) {
     ws.send(JSON.stringify({ subscribe: LOON_STATE_TOPIC }));
   } else if (dataFromClient.type === eventTypes.POP_LOON) {
@@ -59,8 +63,8 @@ const handleMessage = (data, isBinary) => {
         },
       })
     );
-  } else if (dataFromClient.type === "test") {
-    console.log("testing!");
+  } else {
+    console.log("unrecognized message:", dataFromClient);
   }
 };
 

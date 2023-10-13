@@ -8,6 +8,9 @@ import {
   MsgTopicMessageEventData
 } from '../types/types';
 
+// This is fired when we receive a message over the websocket connection.
+// Each time a message comes in, we'll take a resulting action, typically
+//  updating a value in the App's state.
 export const handleWebsocketMessage = (
   msgEvent: MessageEvent<MessageEventPayload['data']>,
   contextData: {

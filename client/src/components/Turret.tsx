@@ -35,7 +35,7 @@ const DragContainer = styled.div<{
     typeof $position.left === 'number' ? `${$position.left}px` : ''};
   top: ${({ $position }) =>
     typeof $position.top === 'number' ? `${$position.top}px` : ''};
-  // Can't put cursor=not-allowed with pointer-events=none (deprioritize)
+  // Can't put cursor=not-allowed with pointer-events=none
   cursor: ${({ $isDragging }) => ($isDragging ? 'grabbing' : 'grab')};
   pointer-events: ${({ $isLocked }) => ($isLocked ? 'none' : '')};
 
@@ -69,6 +69,8 @@ const Turret: FC<TurretProps> = ({
     elementSizePx: TURRET_SIZE_PX
   });
 
+  // Calculate the turret position, then find the closest loon to that position,
+  //  then send the pop_loon command with that loonId.
   const handlePopLoon = useCallback(() => {
     if (loonsPositions.length) {
       const turretPosition = getTurretPositionInLoonUnits(position);

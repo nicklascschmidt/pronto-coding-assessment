@@ -16,6 +16,7 @@ type UseDragAndDropProps = {
 type UseDragAndDropReturnValues = {
   handleMouseDown: MouseEventHandler<HTMLDivElement>;
   isDragging: boolean;
+  // this has `top` and `left` properties, rather than position_x and _y like loons
   position: TurretPosition;
   dragRef: RefObject<HTMLDivElement>;
 };
@@ -31,6 +32,7 @@ const useDragAndDrop = ({
     top: elementSizePx / 2
   });
 
+  // Only after a mouse down event occurs, track the mouses position as it moves.
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
       if (containerRef.current) {
@@ -47,12 +49,15 @@ const useDragAndDrop = ({
     [containerRef]
   );
 
+  // When the drag is complete, clean up the listeners.
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
     document.removeEventListener('mousemove', handleMouseMove);
     document.removeEventListener('mouseup', handleMouseUp);
   }, [handleMouseMove]);
 
+  // when the element is clicked (down only), calculate the position within the container,
+  //  update the position, then add listeners for the mouse move and mouse lift (up).
   const handleMouseDown: MouseEventHandler<HTMLDivElement> = useCallback(
     (e) => {
       e.preventDefault();
@@ -75,7 +80,7 @@ const useDragAndDrop = ({
     [elementSizePx, handleMouseMove, handleMouseUp, position.left, position.top]
   );
 
-  // When the position changes, ensure the turret stays within the canvas.
+  // When the position changes, ensure the element stays within the canvas.
   useEffect(() => {
     if (containerRef.current) {
       const container = containerRef.current.getBoundingClientRect();
