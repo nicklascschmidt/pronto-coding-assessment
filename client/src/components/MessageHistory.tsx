@@ -26,12 +26,16 @@ const MessageHistory: FC<MessageHistoryProps> = ({ messageHistory }) => {
     <MessageHistoryContainer>
       <h5 style={{ textAlign: 'center' }}>Message History</h5>
       <div style={{ overflow: 'auto' }}>
-        {messageHistory.map(({ timestamp, text }, idx) => (
-          <div key={idx}>
-            <TimeText>{new Date(timestamp).toLocaleTimeString()}</TimeText>
-            <p style={{ margin: 0 }}>{text}</p>
-          </div>
-        ))}
+        {messageHistory.length ? (
+          messageHistory.map(({ timestamp, text }, idx) => (
+            <div key={idx}>
+              <TimeText>{new Date(timestamp).toLocaleTimeString()}</TimeText>
+              <p style={{ margin: 0 }}>{text}</p>
+            </div>
+          ))
+        ) : (
+          <div>No messages</div>
+        )}
       </div>
     </MessageHistoryContainer>
   );

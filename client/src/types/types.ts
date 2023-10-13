@@ -8,6 +8,7 @@ export type MessageEventPayload = {
 };
 
 export type LoonPosition = { position_x: number; position_y: number };
+export type LoonPositions = [string, LoonPosition][];
 
 export type LoonStateTopicMessageEventData = {
   loonState: Record<string, LoonPosition>;

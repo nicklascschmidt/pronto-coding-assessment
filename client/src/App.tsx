@@ -16,7 +16,7 @@ import {
 } from './constants/constants';
 import {
   GameStatus,
-  LoonPosition,
+  LoonPositions,
   LoonStateTopicMessageEventData,
   MessageEventData,
   MessageEventPayload,
@@ -75,17 +75,15 @@ const Loon = styled.div<{
 
 const App = () => {
   const loonCanvasRef = useRef<HTMLDivElement>(null);
-  const [loonsPositions, setLoonsPositions] = useState<
-    [string, LoonPosition][]
-  >(
-    // []
-    sampleLoonsData as [string, LoonPosition][]
+  const [loonsPositions, setLoonsPositions] = useState<LoonPositions>(
+    []
+    // sampleLoonsData as LoonPositions
   );
   const [turrets, setTurrets] = useState<TurretState[]>([]);
   const [selectedTurret, setSelectedTurret] = useState<TurretState>();
   const [messageHistory, setMessageHistory] = useState<MessageHistoryList>(
-    // []
-    sampleMessagesData
+    []
+    // sampleMessagesData
   );
   const [gameStatus, setGameStatus] = useState<GameStatus>('NOT_STARTED');
   const { sendJsonMessage, readyState } = useWebSocket(WS_URL, {
@@ -165,11 +163,9 @@ const App = () => {
 
   useEffect(() => {
     if (readyState === ReadyState.OPEN) {
-      sendJsonMessage({
-        type: 'test123'
-      });
+      console.log('Websocket connection is open');
     }
-  }, [sendJsonMessage, readyState]);
+  }, [readyState]);
 
   return (
     <AppContainer>

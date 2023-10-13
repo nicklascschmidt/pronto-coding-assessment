@@ -3,6 +3,7 @@ const http = require("http");
 
 const url = "wss://9f1b-136-24-109-242.ngrok-free.app/PAEaHSpkFugUBTNB/ws";
 let clientConnection = null;
+const LOON_STATE_TOPIC = "loonState";
 
 // If the client websocket connection is open, send the message
 //  through the websocket to the client.
@@ -45,9 +46,9 @@ const eventTypes = {
 const handleMessage = (data, isBinary) => {
   const message = isBinary ? data : data.toString();
   const dataFromClient = JSON.parse(message);
-  const json = { type: dataFromClient.type };
+
   if (dataFromClient.type === eventTypes.START_GAME) {
-    ws.send(JSON.stringify({ subscribe: "loonState" }));
+    ws.send(JSON.stringify({ subscribe: LOON_STATE_TOPIC }));
   } else if (dataFromClient.type === eventTypes.POP_LOON) {
     ws.send(
       JSON.stringify({
@@ -71,6 +72,6 @@ wsServer.on("connection", function (connection) {
   //  Loons websocket server.
   connection.on("message", handleMessage);
 
-  // Client disconnected
+  // TODO: Handle connection close event
   // connection.on("close", handleDisconnect);
 });

@@ -11,11 +11,11 @@ import styled from 'styled-components';
 import {
   getClosestLoon,
   getTurretPositionInLoonUnits
-} from '../helpers/helpers.js';
+} from '../helpers/positionHelpers';
 import useInterval from '../hooks/useInterval';
 import {
   GameStatus,
-  LoonPosition,
+  LoonPositions,
   TurretPosition,
   TurretState
 } from '../types/types.js';
@@ -48,7 +48,7 @@ type TurretProps = {
   turret: TurretState;
   containerRef: RefObject<HTMLDivElement>;
   gameStatus: GameStatus;
-  loonsPositions: [string, LoonPosition][];
+  loonsPositions: LoonPositions;
   sendJsonMessage: SendJsonMessage;
   setSelectedTurret: Dispatch<SetStateAction<TurretState | undefined>>;
   isSelected: boolean;
