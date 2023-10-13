@@ -3,16 +3,18 @@ Take-home assessment submission for the Full Stack Software Engineer position at
 
 ## How to run the app?
 
+Run two terminal windows simultaneously. Use npm or yarn.
+
 ```bash
 #-- Setup and start the server
 cd server
-npm install # or yarn install
-npm start # or yarn start
+npm install
+npm start
 
 #-- Setup and start the client
 cd client
-npm install # or yarn install
-npm start # or yarn start
+npm install
+npm start
 ```
 
 ## Instructions

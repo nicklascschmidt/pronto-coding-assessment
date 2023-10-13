@@ -70,12 +70,12 @@ const Turret: FC<TurretProps> = ({
   });
 
   const handlePopLoon = useCallback(() => {
-    const turretPosition = getTurretPositionInLoonUnits(position);
-    const closestLoonId = getClosestLoon(loonsPositions, turretPosition);
-    if (closestLoonId) {
-      sendJsonMessage({ type: 'pop_loon', data: closestLoonId });
-    } else {
-      console.log('no loons to pop?', closestLoonId, loonsPositions);
+    if (loonsPositions.length) {
+      const turretPosition = getTurretPositionInLoonUnits(position);
+      const closestLoonId = getClosestLoon(loonsPositions, turretPosition);
+      if (closestLoonId) {
+        sendJsonMessage({ type: 'pop_loon', data: closestLoonId });
+      }
     }
   }, [position, loonsPositions, sendJsonMessage]);
 
@@ -84,10 +84,6 @@ const Turret: FC<TurretProps> = ({
       handlePopLoon();
     }
   }, 1000);
-
-  useEffect(() => {
-    console.log('new gameStatus', gameStatus);
-  }, [gameStatus]);
 
   // If user selects a turret, add a click listener to monitor
   //  if a user clicks off the turret (on the canvas).

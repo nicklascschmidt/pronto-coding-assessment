@@ -17,16 +17,13 @@ import {
 import {
   GameStatus,
   LoonPositions,
-  LoonStateTopicMessageEventData,
-  MessageEventData,
-  MessageEventPayload,
   MessageHistoryList,
-  MsgTopicMessageEventData,
   TurretState
 } from './types/types';
 import './App.css';
 import MessageHistory from './components/MessageHistory';
 import SelectedTurretDetails from './components/SelectedTurretDetails';
+import { handleWebsocketMessage } from './helpers/websocketHelpers';
 
 const WS_URL = 'ws://127.0.0.1:8000';
 
@@ -94,51 +91,27 @@ const App = () => {
     filter: () => false,
     retryOnError: true,
     shouldReconnect: () => true,
-    onMessage: (msgEvent: MessageEvent<MessageEventPayload['data']>) => {
-      // console.log('msgEvent.data', msgEvent.data);
-      const parsedMessage: MessageEventData = JSON.parse(msgEvent.data);
-      if ('msg' in parsedMessage) {
-        console.log('received a message', parsedMessage);
-        if (
-          (parsedMessage as MsgTopicMessageEventData)?.msg?.msg.includes(
-            'No loons left'
-          )
-        ) {
-          // We need to be able to pause between rounds, so users can update turrets.
-          // setGameStatus('ENDED');
-        } else {
-          setMessageHistory([
-            {
-              timestamp: Date.now(),
-              text:
-                (parsedMessage as MsgTopicMessageEventData)?.msg?.msg ||
-                'No message data.'
-            },
-            ...messageHistory
-          ]);
-        }
-      } else if ('loonState' in parsedMessage) {
-        console.log('received loon state', parsedMessage);
-        const loonStateEntries = Object.entries(
-          (parsedMessage as LoonStateTopicMessageEventData).loonState
-        );
-        setLoonsPositions(loonStateEntries);
-      } else {
-        console.log('parsed', parsedMessage);
-      }
-    }
+    onMessage: (evt) =>
+      handleWebsocketMessage(evt, {
+        messageHistory,
+        setMessageHistory,
+        setLoonsPositions
+      })
   });
 
+  // Starting the game will subscribe to loonState messages in the backend.
+  // Track game status on the FE bc there's no system built out on the server.
+  // When game is started, turrets are locked.
   const handleStartGame = () => {
-    console.log('start!');
     sendJsonMessage({ type: 'start_game' });
     setGameStatus('IN_PROGRESS');
     setSelectedTurret(undefined);
   };
 
+  // This sets the turrets to inactive, but ideally should also send a
+  //  message thru the websocket to end the round and start a new one.
+  //  i.e. sendJsonMessage({ type: "end_game" });
   const handleEndGame = () => {
-    console.log('end!');
-    // sendJsonMessage({ type: "end_game" });
     setGameStatus('ENDED');
   };
 
