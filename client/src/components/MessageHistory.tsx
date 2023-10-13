@@ -7,10 +7,9 @@ const MessageHistoryContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  /* height: 400px; */
   border: 1px solid black;
   padding: 0.5rem;
-  overflow: auto;
+  overflow: hidden;
 `;
 
 const TimeText = styled.p`
@@ -26,12 +25,14 @@ const MessageHistory: FC<MessageHistoryProps> = ({ messageHistory }) => {
   return (
     <MessageHistoryContainer>
       <h5 style={{ textAlign: 'center' }}>Message History</h5>
-      {messageHistory.map(({ timestamp, text }, idx) => (
-        <div key={idx}>
-          <TimeText>{new Date(timestamp).toLocaleTimeString()}</TimeText>
-          <p style={{ margin: 0 }}>{text}</p>
-        </div>
-      ))}
+      <div style={{ overflow: 'auto' }}>
+        {messageHistory.map(({ timestamp, text }, idx) => (
+          <div key={idx}>
+            <TimeText>{new Date(timestamp).toLocaleTimeString()}</TimeText>
+            <p style={{ margin: 0 }}>{text}</p>
+          </div>
+        ))}
+      </div>
     </MessageHistoryContainer>
   );
 };

@@ -6,6 +6,7 @@ import Turret from './components/Turret';
 import BalloonIcon from './components/BalloonIcon';
 import CommandPanel from './components/CommandPanel';
 import sampleLoonsData from './data/sampleLoonsData.json';
+import sampleMessagesData from './data/sampleMessagesData.json';
 import {
   CANVAS_HEIGHT_PX,
   CANVAS_WIDTH_PX,
@@ -25,20 +26,24 @@ import {
 } from './types/types';
 import './App.css';
 import MessageHistory from './components/MessageHistory';
+import SelectedTurretDetails from './components/SelectedTurretDetails';
 
 const WS_URL = 'ws://127.0.0.1:8000';
 
 const AppContainer = styled.div`
+  height: calc(${CANVAS_HEIGHT_PX}px * ${PX_MULTIPLIER});
   display: grid;
   grid-template-columns: 1fr min-content;
   gap: 1rem;
-  margin: 1rem;
+  padding: 1rem;
 `;
 
 const CommandPanelContainer = styled.div`
-  display: grid;
-  grid-template-rows: min-content 1fr;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
   gap: 0.5rem;
+  height: 100%;
 `;
 
 // Width ranges from 0-200 for the loon positions, so imagine the
@@ -73,12 +78,15 @@ const App = () => {
   const [loonsPositions, setLoonsPositions] = useState<
     [string, LoonPosition][]
   >(
-    []
-    // sampleLoonsData as [string, LoonPosition][]
+    // []
+    sampleLoonsData as [string, LoonPosition][]
   );
   const [turrets, setTurrets] = useState<TurretState[]>([]);
   const [selectedTurret, setSelectedTurret] = useState<TurretState>();
-  const [messageHistory, setMessageHistory] = useState<MessageHistoryList>([]);
+  const [messageHistory, setMessageHistory] = useState<MessageHistoryList>(
+    // []
+    sampleMessagesData
+  );
   const [gameStatus, setGameStatus] = useState<GameStatus>('NOT_STARTED');
   const { sendJsonMessage, readyState } = useWebSocket(WS_URL, {
     onOpen: () => {
@@ -98,7 +106,8 @@ const App = () => {
             'No loons left'
           )
         ) {
-          setGameStatus('ENDED');
+          // We need to be able to pause between rounds, so users can update turrets.
+          // setGameStatus('ENDED');
         } else {
           setMessageHistory([
             {
@@ -169,9 +178,13 @@ const App = () => {
           handleStartGame={handleStartGame}
           handleEndGame={handleEndGame}
           handleAddTurret={handleAddTurret}
-          selectedTurret={selectedTurret}
-          handleLevelUpTurret={handleLevelUpTurret}
         />
+        {selectedTurret && (
+          <SelectedTurretDetails
+            turret={selectedTurret}
+            handleLevelUpTurret={handleLevelUpTurret}
+          />
+        )}
         <MessageHistory messageHistory={messageHistory} />
       </CommandPanelContainer>
 
